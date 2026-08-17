@@ -22,18 +22,29 @@ interface Campaign {
   matchAnyPost: boolean;
   keywords: string[];
   matchAnyWord: boolean;
+  dmTriggerEnabled: boolean;
   dmMessage: string;
   openingDmEnabled: boolean;
   openingDmMessage: string | null;
   openingDmButtonLabel: string | null;
   linkButtonLabel: string | null;
+  requireFollow: boolean;
+  followPromptMessage: string | null;
+  followPromptButtonLabel: string | null;
+  followUpEnabled: boolean;
+  followUpMessage: string | null;
+  followUpDelayMinutes: number | null;
   publicReplyEnabled: boolean;
   publicReplyMessage: string | null;
   publicReplyMessages: string[];
   isActive: boolean;
   instagramAccountId: string;
   instagramAccount: { username: string };
-  trackedLinks?: { destinationUrl: string }[];
+  trackedLinks?: {
+    destinationUrl: string;
+    label?: string | null;
+    trackedUrl?: string;
+  }[];
   analytics: {
     sent: number;
     skipped: number;
@@ -138,6 +149,7 @@ export default function CampaignDetailPage() {
         ? [campaign.publicReplyMessage]
         : [];
   const hasLink = Boolean(campaign.trackedLinks?.[0]?.destinationUrl);
+  const hasSecondLink = Boolean(campaign.trackedLinks?.[1]?.destinationUrl);
 
   const trigger = campaign.matchAnyPost
     ? "Any post or reel"
@@ -173,7 +185,7 @@ export default function CampaignDetailPage() {
             className={`shrink-0 rounded px-2 py-0.5 text-xs font-semibold ${
               campaign.isActive
                 ? "bg-success/10 text-success"
-                : "bg-zinc-500/10 text-zinc-400"
+                : "bg-zinc-500/10 text-muted"
             }`}
           >
             {campaign.isActive ? "LIVE" : "Paused"}
@@ -200,6 +212,12 @@ export default function CampaignDetailPage() {
 
         <Summary title="And this comment has">
           <FieldBox>{matchText}</FieldBox>
+          {campaign.dmTriggerEnabled && (
+            <p className="text-xs text-muted">
+              Also replies when someone DMs{" "}
+              {campaign.matchAnyWord ? "anything" : "these words"}.
+            </p>
+          )}
           {publicReplies.length > 0 && (
             <div className="space-y-1.5">
               <p className="text-xs text-muted">Public reply under the post</p>
@@ -217,12 +235,60 @@ export default function CampaignDetailPage() {
           </Summary>
         )}
 
+        {campaign.requireFollow && (
+          <Summary title="They must follow first">
+            <FieldBox>
+              {campaign.followPromptMessage ||
+                "quick favor before i send your link. i don't make any money from this, it's free. if you want to support me, just don't unfollow after, and star the repo on github if it helps you. tap the button once you're following and i'll send it over"}
+            </FieldBox>
+            <FieldBox>
+              {campaign.followPromptButtonLabel || "i'm following"}
+            </FieldBox>
+          </Summary>
+        )}
+
         <Summary title="And then, they will get a DM">
           <FieldBox>{campaign.dmMessage}</FieldBox>
           {hasLink && (
             <FieldBox>{campaign.linkButtonLabel || "Open link"}</FieldBox>
           )}
+          {hasSecondLink && (
+            <FieldBox>
+              {campaign.trackedLinks?.[1]?.label || "Open link"}
+            </FieldBox>
+          )}
         </Summary>
+
+        {hasLink && (
+          <Summary title="The exact link sent">
+            {campaign.trackedLinks
+              ?.filter((link) => link.destinationUrl)
+              .map((link, i) => (
+                <div key={i} className="space-y-1">
+                  <div className="rounded border border-border bg-surface px-3 py-2">
+                    <p className="select-all break-all font-mono text-xs text-foreground">
+                      {link.trackedUrl ?? link.destinationUrl}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted">
+                    {link.label ? `${link.label} · ` : ""}redirects to{" "}
+                    <span className="break-all">{link.destinationUrl}</span>
+                  </p>
+                </div>
+              ))}
+          </Summary>
+        )}
+
+        {campaign.followUpEnabled && campaign.followUpMessage && (
+          <Summary title="Then a follow-up message">
+            <FieldBox>{campaign.followUpMessage}</FieldBox>
+            <p className="text-xs text-muted">
+              {campaign.followUpDelayMinutes && campaign.followUpDelayMinutes > 0
+                ? `Sent ${campaign.followUpDelayMinutes} min after the link.`
+                : "Sent right after the link."}
+            </p>
+          </Summary>
+        )}
       </div>
 
       {/* Right: top bar + tabs */}
@@ -280,6 +346,7 @@ export default function CampaignDetailPage() {
             postThumb={postThumb}
             caption=""
             sampleComment={campaign.matchAnyWord ? "nice!" : campaign.keywords[0] ?? "LINK"}
+            dmTriggerEnabled={campaign.dmTriggerEnabled}
             publicReplyEnabled={campaign.publicReplyEnabled}
             publicReplyMessage={publicReplies[0] ?? ""}
             openingDmEnabled={campaign.openingDmEnabled}
@@ -288,6 +355,22 @@ export default function CampaignDetailPage() {
             revealMessage={campaign.dmMessage}
             hasLink={hasLink}
             linkButtonLabel={campaign.linkButtonLabel ?? "Open link"}
+            linkUrl={
+              campaign.trackedLinks?.[0]?.trackedUrl ??
+              campaign.trackedLinks?.[0]?.destinationUrl
+            }
+            hasSecondLink={hasSecondLink}
+            secondLinkButtonLabel={
+              campaign.trackedLinks?.[1]?.label ?? "Open link"
+            }
+            requireFollow={campaign.requireFollow}
+            followPromptMessage={campaign.followPromptMessage ?? ""}
+            followPromptButtonLabel={
+              campaign.followPromptButtonLabel ?? "i'm following"
+            }
+            followUpEnabled={campaign.followUpEnabled ?? false}
+            followUpMessage={campaign.followUpMessage ?? ""}
+            followUpDelayMinutes={campaign.followUpDelayMinutes ?? 0}
           />
           </div>
         )}

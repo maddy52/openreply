@@ -27,6 +27,8 @@ OpenReply is built around Meta's official Instagram private replies. It does not
 - Keyword to DM. Match one or many keywords per post, whole-word or partial.
 - Optional public reply. Post a visible comment reply on top of the DM.
 - Tracked links. Swap a link for a tracked redirect and see clicks and CTR per campaign.
+- Two link buttons. Send up to two tappable link buttons in one DM, each a separate tracked link with its own click stats.
+- Follow gate. Optionally require a follow before you hand over the link. The DM asks the commenter to follow and tap a button; on tap, OpenReply checks Meta's `is_user_follow_business` flag and only sends the link once they follow, re-prompting until then. It fails open (sends the link anyway) when Instagram does not return follow status, so a real follower is never trapped.
 - Personalization. Use `{username}` in your message to greet the commenter by name.
 - Per-account rate limiting. Stays under Meta's documented cap of 750 private replies per hour, and queues the overflow instead of dropping it.
 - Multiple Instagram accounts. Connect several professional accounts under one workspace, each with its own limits.
@@ -86,6 +88,8 @@ If you use Claude Code, Cursor, or a similar tool, the Meta setup is a lot faste
 - Tailwind CSS for the interface
 - The official Instagram API with Instagram Login
 
+For the complete stack — application libraries, the two runtime processes, and the free services this runs on (Vercel, Neon, Redis Cloud, an Oracle Cloud always-free VM for the worker, Resend, Meta) — see [docs/stack.md](docs/stack.md).
+
 ## Contributing
 
 Issues and pull requests are welcome. If you hit a Meta quirk that is not in the setup guide, a PR that documents it is worth as much as a code fix, because that is where everyone loses time.
@@ -98,7 +102,7 @@ Built and maintained by Diwen Huang.
 
 - GitHub: [@diwenne](https://github.com/diwenne)
 - Website: [diwenhuang.ca](https://diwenhuang.ca)
-- X: [@diwenne](https://x.com/diwenne)
+- X: [@diwenne](https://x.com/diwennee)
 - Instagram: [@devdiwen](https://instagram.com/devdiwen)
 
 OpenReply is a fork of [instagram-comment-to-dm](https://github.com/im-anishraj/instagram-comment-to-dm) by [Anish Raj](https://github.com/im-anishraj), also MIT licensed. The billing layer and plan caps were removed, and the setup was documented from scratch.

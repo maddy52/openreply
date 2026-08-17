@@ -11,6 +11,7 @@
 import { useEffect, useState } from "react";
 import AccountSelect from "@/components/account-select";
 import StatCard from "@/components/stat-card";
+import FollowerChart from "@/components/follower-chart";
 import type { OverviewResponse } from "@/app/api/instagram/overview/route";
 
 function formatNumber(n: number | null): string {
@@ -72,11 +73,11 @@ export default function OverviewPage() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
         {[...Array(6)].map((_, i) => (
-          <div key={i} className="panel rounded p-5 h-24">
-            <div className="h-4 w-16 bg-zinc-800 rounded" />
-            <div className="mt-3 h-6 w-20 bg-zinc-800/60 rounded" />
+          <div key={i} className="panel rounded p-4 h-24 sm:p-5">
+            <div className="h-4 w-16 bg-zinc-200 rounded" />
+            <div className="mt-3 h-6 w-20 bg-zinc-200/60 rounded" />
           </div>
         ))}
       </div>
@@ -101,12 +102,13 @@ export default function OverviewPage() {
 
   if (!data) return null;
 
-  const { totals, posts, accounts, insightsAvailable } = data;
+  const { totals, posts, accounts, insightsAvailable, followers, followerHistory } =
+    data;
 
   return (
     <div className="space-y-8">
-      <div className="flex items-end justify-between gap-4">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-lg font-semibold text-foreground">Overview</h1>
           <p className="text-sm text-muted mt-1">
             {data.requestedCount === "all" ? "All-time" : "Recent"} —{" "}
@@ -114,8 +116,15 @@ export default function OverviewPage() {
             {data.account.username}
             {data.truncated ? ` (capped at ${totals.posts})` : ""}
           </p>
+          {followers !== null && (
+            // Kept out of the tile row below: that row sums the selected posts,
+            // whereas this is a current account-level total.
+            <p className="mt-1 text-sm text-muted">
+              {followers.toLocaleString()} followers
+            </p>
+          )}
         </div>
-        <div className="flex items-end gap-3">
+        <div className="flex flex-wrap items-end gap-x-4 gap-y-3">
           <label className="flex flex-col gap-2 text-sm">
             <span className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
               Range
@@ -123,7 +132,7 @@ export default function OverviewPage() {
             <select
               value={count}
               onChange={(e) => handleCountChange(e.target.value)}
-              className="min-w-36 rounded-xl border border-border bg-surface px-3 py-2 text-sm text-foreground outline-none transition-colors focus:border-accent/40"
+              className="border-0 bg-transparent py-2 pr-1 text-sm text-foreground outline-none"
             >
               {COUNT_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -165,7 +174,7 @@ export default function OverviewPage() {
       )}
 
       {/* Aggregate totals */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
         <StatCard label="Views" value={formatNumber(totals.views)} />
         <StatCard label="Reach" value={formatNumber(totals.reach)} />
         <StatCard label="Likes" value={formatNumber(totals.likes)} />
@@ -174,14 +183,19 @@ export default function OverviewPage() {
         <StatCard label="Shares" value={formatNumber(totals.shares)} />
       </div>
 
+      {/* Follower trend — account-level, independent of the post range */}
+      <FollowerChart data={followerHistory} followers={followers} />
+
       {/* Per-post table */}
-      <div className="panel rounded p-6">
+      <div className="panel rounded p-4 sm:p-6">
         <h2 className="text-sm font-semibold text-foreground mb-4">Posts</h2>
         {posts.length === 0 ? (
           <p className="text-sm text-muted py-8 text-center">No posts found</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+          // Eight metric columns can't compress into a phone; let the table keep
+          // its natural width and scroll inside the panel instead.
+          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <table className="w-full min-w-[720px] text-sm">
               <thead>
                 <tr className="text-left text-xs uppercase tracking-wide text-zinc-500 border-b border-border">
                   <th className="py-2 pr-4 font-medium">Post</th>

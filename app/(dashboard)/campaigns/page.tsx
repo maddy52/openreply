@@ -29,6 +29,9 @@ interface Campaign {
   publicReplyEnabled: boolean;
   publicReplyMessage: string | null;
   publicReplyMessages: string[];
+  requireFollow: boolean;
+  followPromptMessage: string | null;
+  followPromptButtonLabel: string | null;
   isActive: boolean;
   wholeWordMatch: boolean;
   instagramAccountId: string;
@@ -44,6 +47,7 @@ interface Campaign {
   trackedLinks: Array<{
     id: string;
     slug: string;
+    label: string | null;
     destinationUrl: string;
     trackedUrl: string;
     _count: { clicks: number };
@@ -75,6 +79,7 @@ export default function CampaignsPage() {
     postUrl: string | null;
   } | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "paused">(
     "all"
@@ -207,6 +212,21 @@ export default function CampaignsPage() {
     }
   }
 
+  async function copyReelUrl(auto: Campaign) {
+    setMenuOpenId(null);
+    if (!auto.postUrl) return;
+    try {
+      await navigator.clipboard.writeText(auto.postUrl);
+      setCopiedId(auto.id);
+      window.setTimeout(
+        () => setCopiedId((cur) => (cur === auto.id ? null : cur)),
+        1500
+      );
+    } catch (err) {
+      console.error("Failed to copy reel URL:", err);
+    }
+  }
+
   async function deleteAutomation(id: string) {
     if (!confirm("Delete this campaign? This cannot be undone.")) return;
     try {
@@ -240,6 +260,11 @@ export default function CampaignsPage() {
           publicReplyEnabled: auto.publicReplyEnabled,
           publicReplyMessages: auto.publicReplyMessages,
           trackedDestinationUrl: auto.trackedLinks[0]?.destinationUrl ?? "",
+          secondaryDestinationUrl: auto.trackedLinks[1]?.destinationUrl ?? "",
+          secondaryButtonLabel: auto.trackedLinks[1]?.label ?? "Open link",
+          requireFollow: auto.requireFollow,
+          followPromptMessage: auto.followPromptMessage,
+          followPromptButtonLabel: auto.followPromptButtonLabel,
           wholeWordMatch: auto.wholeWordMatch,
           isActive: false,
         }),
@@ -287,7 +312,7 @@ export default function CampaignsPage() {
             campaign{automations.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div className="flex flex-wrap items-end gap-3">
           {accounts.length > 1 && (
             <AccountSelect
               accounts={accounts}
@@ -297,13 +322,13 @@ export default function CampaignsPage() {
           )}
           <Link
             href="/campaigns/import"
-            className="px-4 py-2 rounded border border-border text-sm font-medium text-muted hover:text-foreground"
+            className="flex-1 rounded border border-border px-4 py-2 text-center text-sm font-medium text-muted hover:text-foreground sm:flex-none"
           >
             Import
           </Link>
           <Link
             href="/campaigns/new"
-            className="px-4 py-2 rounded bg-accent text-sm font-medium text-white hover:bg-accent-hover"
+            className="flex-1 rounded bg-accent px-4 py-2 text-center text-sm font-medium text-white hover:bg-accent-hover sm:flex-none"
           >
             New Campaign
           </Link>
@@ -340,7 +365,7 @@ export default function CampaignsPage() {
 
       {/* Empty state */}
       {automations.length === 0 && (
-        <div className="panel rounded p-12 text-center">
+        <div className="panel rounded p-8 text-center sm:p-12">
           <h3 className="text-lg font-semibold mb-2">No campaigns yet</h3>
           <p className="text-sm text-muted mb-6 max-w-sm mx-auto">
             Create your first comment-to-DM campaign to turn a post or reel into a measurable conversation flow.
@@ -371,7 +396,9 @@ export default function CampaignsPage() {
             onClick={() => router.push(`/campaigns/${auto.id}`)}
             className="panel rounded p-4 hover:border-border-hover transition-all cursor-pointer"
           >
-            <div className="flex items-start justify-between gap-4">
+            {/* Wraps rather than compressing: on a phone the action buttons drop
+                to their own line instead of squeezing the campaign summary. */}
+            <div className="flex flex-wrap items-start gap-x-4 gap-y-3">
               {auto.postId && thumbnails[auto.postId] && (
                 videoUrl ? (
                   <button
@@ -413,8 +440,8 @@ export default function CampaignsPage() {
                   </a>
                 )
               )}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-2">
+              <div className="min-w-[12rem] flex-1">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
                   <h3 className="text-sm font-semibold truncate">{auto.name}</h3>
                   <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-xs text-muted">
                     @{auto.instagramAccount.username}
@@ -423,14 +450,24 @@ export default function CampaignsPage() {
                     className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                       auto.isActive
                         ? "bg-success/10 text-success"
-                        : "bg-zinc-500/10 text-zinc-400"
+                        : "bg-zinc-500/10 text-muted"
                     }`}
                   >
                     {auto.isActive ? "Active" : "Paused"}
                   </span>
                   {auto.pendingNextReel && (
-                    <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-amber-400">
+                    <span className="shrink-0 rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-medium text-warning">
                       Waiting for next reel
+                    </span>
+                  )}
+                  {auto.requireFollow && (
+                    <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                      Follow gate
+                    </span>
+                  )}
+                  {auto.trackedLinks.length >= 2 && (
+                    <span className="shrink-0 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                      2 links
                     </span>
                   )}
                 </div>
@@ -449,6 +486,13 @@ export default function CampaignsPage() {
 
                 {/* DM preview */}
                 <p className="text-sm text-muted truncate">&ldquo;{auto.dmMessage}&rdquo;</p>
+
+                {/* Tracked link sent */}
+                {auto.trackedLinks[0]?.trackedUrl && (
+                  <p className="mt-2 truncate font-mono text-xs text-zinc-500">
+                    {auto.trackedLinks[0].trackedUrl}
+                  </p>
+                )}
 
                 {/* Stats */}
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3 text-xs text-zinc-500">
@@ -485,15 +529,24 @@ export default function CampaignsPage() {
 
               {/* Actions */}
               <div
-                className="flex items-center gap-2"
+                className="ml-auto flex items-center gap-2"
                 onClick={(e) => e.stopPropagation()}
               >
+                {/* Copy reel URL */}
+                {auto.postUrl && (
+                  <button
+                    onClick={() => void copyReelUrl(auto)}
+                    className="shrink-0 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-muted transition-colors hover:border-border-hover hover:text-foreground"
+                  >
+                    {copiedId === auto.id ? "Copied!" : "Copy URL"}
+                  </button>
+                )}
                 {/* Toggle */}
                 <button
                   onClick={() => toggleActive(auto.id, auto.isActive)}
                   className={`
                     relative w-11 h-6 rounded-full transition-colors
-                    ${auto.isActive ? "bg-accent" : "bg-zinc-700"}
+                    ${auto.isActive ? "bg-accent" : "bg-zinc-300"}
                   `}
                 >
                   <span
@@ -555,7 +608,7 @@ export default function CampaignsPage() {
           onClick={() => setPlayingVideo(null)}
         >
           <div
-            className="relative flex flex-col items-end gap-2"
+            className="relative flex max-w-full flex-col items-end gap-2"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center gap-4 text-sm">

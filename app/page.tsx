@@ -122,6 +122,34 @@ function OverviewPreview() {
       </div>
 
       <div className="mt-4 rounded border border-border bg-surface p-4">
+        <div className="flex items-baseline justify-between">
+          <p className="text-sm font-semibold text-foreground">
+            Followers over time
+          </p>
+          <p className="text-xs text-muted">
+            48,210 <span className="text-success">+1,240</span> · 30d
+          </p>
+        </div>
+        <svg
+          viewBox="0 0 300 64"
+          preserveAspectRatio="none"
+          className="mt-3 h-16 w-full"
+          aria-hidden="true"
+        >
+          <polyline
+            points="0,54 43,49 86,51 129,40 171,36 214,26 257,20 300,9"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
+            className="text-accent"
+          />
+        </svg>
+      </div>
+
+      <div className="mt-4 rounded border border-border bg-surface p-4">
         <p className="text-sm font-semibold text-foreground">Posts</p>
         <table className="mt-3 w-full text-sm">
           <thead>
@@ -256,11 +284,11 @@ async function getGitHubStars(): Promise<number | null> {
 export default async function Home() {
   const stars = await getGitHubStars();
   return (
-    <main className="min-h-screen bg-background text-foreground">
-      <header className="sticky top-0 z-40 border-b border-border bg-background">
+    <main className="min-h-screen bg-white text-zinc-900">
+      <header className="sticky top-0 z-40 border-b border-zinc-200 bg-white">
         <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-5 sm:px-6 lg:px-8">
           <Link href="/" className="flex items-center gap-3" aria-label="OpenReply home">
-            <span className="text-lg font-bold text-white">OpenReply</span>
+            <span className="text-lg font-bold text-zinc-900">OpenReply</span>
           </Link>
 
           <div className="flex items-center gap-4">
@@ -268,7 +296,7 @@ export default async function Home() {
               href={GITHUB_URL}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-400 transition hover:text-white"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-600 transition hover:text-zinc-900"
               aria-label="View OpenReply on GitHub"
             >
               <svg viewBox="0 0 16 16" aria-hidden="true" className="h-4 w-4 fill-current">
@@ -278,7 +306,7 @@ export default async function Home() {
             </a>
             <Link
               href="/login"
-              className="inline-flex items-center justify-center gap-2 bg-cyan-300 px-4 py-2 text-sm font-bold text-zinc-950 transition hover:bg-cyan-200"
+              className="inline-flex items-center justify-center gap-2 bg-orange-500 px-4 py-2 text-sm font-bold text-white transition hover:bg-orange-600"
             >
               Get started
             </Link>
@@ -288,15 +316,15 @@ export default async function Home() {
 
       <section className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 pb-16 pt-12 sm:px-6 sm:pt-18 lg:grid-cols-[0.95fr_1.05fr] lg:px-8 lg:pb-24">
         <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 border border-white/10 bg-white/[0.04] px-3 py-2 text-sm font-semibold text-zinc-300">
+          <div className="inline-flex items-center gap-2 border border-zinc-200 bg-white px-3 py-2 text-sm font-semibold text-zinc-600">
             Open source · Official Meta API
           </div>
 
-          <h1 className="mt-7 text-balance text-5xl font-black leading-[1.02] text-white sm:text-6xl lg:text-7xl">
+          <h1 className="mt-7 text-balance text-5xl font-black leading-[1.02] text-zinc-900 sm:text-6xl lg:text-7xl">
             Make every comment start the right DM
           </h1>
 
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-300">
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-zinc-600">
             Open-sourced ManyChat. When someone comments your keyword on a post
             or reel, they get your DM a second later. Free, self-hosted, and
             built on the official Instagram API.
@@ -305,13 +333,13 @@ export default async function Home() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center gap-2 bg-cyan-300 px-6 py-3 text-sm font-bold text-zinc-950 transition hover:bg-cyan-200"
+              className="inline-flex items-center justify-center gap-2 bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
             >
               Get started
             </Link>
             <a
               href="#how"
-              className="inline-flex items-center justify-center border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-bold text-white transition hover:border-white/20 hover:bg-white/[0.08]"
+              className="inline-flex items-center justify-center border border-zinc-200 bg-white px-6 py-3 text-sm font-bold text-zinc-900 transition hover:border-zinc-300 hover:bg-zinc-100"
             >
               See how it works
             </a>
@@ -319,8 +347,8 @@ export default async function Home() {
 
           <dl className="mt-10 grid max-w-xl grid-cols-3 gap-3">
             {heroStats.map((stat) => (
-              <div key={stat.label} className="border border-white/10 bg-white/[0.035] p-4">
-                <dt className="text-2xl font-black text-white">{stat.value}</dt>
+              <div key={stat.label} className="border border-zinc-200 bg-zinc-50 p-4">
+                <dt className="text-2xl font-black text-zinc-900">{stat.value}</dt>
                 <dd className="mt-1 text-xs leading-5 text-zinc-500">{stat.label}</dd>
               </div>
             ))}
@@ -338,11 +366,11 @@ export default async function Home() {
       <section id="how" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
           <div>
-            <p className="text-sm font-bold uppercase text-cyan-200">How it works</p>
-            <h2 className="mt-3 text-4xl font-black leading-tight text-white sm:text-5xl">
+            <p className="text-sm font-bold uppercase text-orange-600">How it works</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight text-zinc-900 sm:text-5xl">
               A comment in, a DM out
             </h2>
-            <p className="mt-5 text-base leading-8 text-zinc-400">
+            <p className="mt-5 text-base leading-8 text-zinc-600">
               Three steps. Connect an account, build a campaign, and let it run.
               The webhook handles it live and the poll sweeps up whatever the
               webhook misses.
@@ -353,12 +381,12 @@ export default async function Home() {
             {flowSteps.map((step) => (
               <article
                 key={step.title}
-                className="grid gap-4 border border-white/10 bg-white/[0.035] p-5 sm:grid-cols-[120px_1fr]"
+                className="grid gap-4 border border-zinc-200 bg-zinc-50 p-5 sm:grid-cols-[120px_1fr]"
               >
-                <p className="text-sm font-bold text-cyan-200">{step.eyebrow}</p>
+                <p className="text-sm font-bold text-orange-600">{step.eyebrow}</p>
                 <div>
-                  <h3 className="text-xl font-bold text-white">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-400">{step.description}</p>
+                  <h3 className="text-xl font-bold text-zinc-900">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-zinc-600">{step.description}</p>
                 </div>
               </article>
             ))}
@@ -366,16 +394,16 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="border-y border-white/10 bg-white/[0.025] py-20">
+      <section className="border-y border-zinc-200 bg-zinc-50 py-20">
         <div className="mx-auto grid w-full max-w-6xl gap-10 px-5 sm:px-6 lg:grid-cols-[1.08fr_0.92fr] lg:px-8 lg:items-center">
           <DashboardPreview />
 
           <div>
-            <p className="text-sm font-bold uppercase text-cyan-200">The dashboard</p>
-            <h2 className="mt-3 text-4xl font-black leading-tight text-white sm:text-5xl">
+            <p className="text-sm font-bold uppercase text-orange-600">The dashboard</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight text-zinc-900 sm:text-5xl">
               See exactly what happened
             </h2>
-            <p className="mt-5 text-base leading-8 text-zinc-400">
+            <p className="mt-5 text-base leading-8 text-zinc-600">
               Every comment event is traceable: queued, matched, sent, skipped,
               failed, or rate-limited. No black box.
             </p>
@@ -385,11 +413,11 @@ export default async function Home() {
 
       <section id="features" className="mx-auto w-full max-w-6xl px-5 py-20 sm:px-6 lg:px-8">
         <div className="max-w-2xl">
-          <p className="text-sm font-bold uppercase text-cyan-200">What&rsquo;s included</p>
-          <h2 className="mt-3 text-4xl font-black leading-tight text-white sm:text-5xl">
+          <p className="text-sm font-bold uppercase text-orange-600">What&rsquo;s included</p>
+          <h2 className="mt-3 text-4xl font-black leading-tight text-zinc-900 sm:text-5xl">
             Everything, no tiers
           </h2>
-          <p className="mt-5 text-base leading-8 text-zinc-400">
+          <p className="mt-5 text-base leading-8 text-zinc-600">
             It is self-hosted and open source, so there is nothing to unlock. You
             run it, you own it.
           </p>
@@ -399,7 +427,7 @@ export default async function Home() {
           {features.map((feature) => (
             <div
               key={feature}
-              className="border border-white/10 bg-white/[0.035] p-4 text-sm font-semibold text-zinc-200"
+              className="border border-zinc-200 bg-zinc-50 p-4 text-sm font-semibold text-zinc-700"
             >
               {feature}
             </div>
@@ -408,25 +436,25 @@ export default async function Home() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-5 pb-20 sm:px-6 lg:px-8">
-        <div className="grid gap-8 border border-white/10 bg-surface p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
+        <div className="grid gap-8 border border-orange-200 bg-orange-50 p-6 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
-            <h2 className="max-w-3xl text-4xl font-black leading-tight text-white sm:text-5xl">
+            <h2 className="max-w-3xl text-4xl font-black leading-tight text-zinc-900 sm:text-5xl">
               Turn your next reel&rsquo;s comments into DMs
             </h2>
-            <p className="mt-4 text-base text-zinc-400">
+            <p className="mt-4 text-base text-zinc-600">
               Free and open source. Star it if it saves you a subscription.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center gap-2 bg-cyan-300 px-6 py-3 text-sm font-bold text-zinc-950 transition hover:bg-cyan-200"
+              className="inline-flex items-center justify-center gap-2 bg-orange-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-orange-600"
             >
               Get started
             </Link>
             <a
               href={GITHUB_URL}
-              className="inline-flex items-center justify-center border border-white/10 bg-white/[0.04] px-6 py-3 text-sm font-bold text-white transition hover:border-white/20 hover:bg-white/[0.08]"
+              className="inline-flex items-center justify-center border border-zinc-200 bg-white px-6 py-3 text-sm font-bold text-zinc-900 transition hover:border-zinc-300 hover:bg-zinc-100"
             >
               View on GitHub
             </a>
@@ -434,14 +462,14 @@ export default async function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 py-8">
+      <footer className="border-t border-zinc-200 py-8">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-5 text-sm text-zinc-500 sm:px-6 lg:px-8">
-          <span className="font-semibold text-zinc-300">OpenReply</span>
+          <span className="font-semibold text-zinc-600">OpenReply</span>
           <a
             href={GITHUB_URL}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2 transition hover:text-white"
+            className="inline-flex items-center gap-2 transition hover:text-zinc-900"
           >
             <svg
               viewBox="0 0 16 16"

@@ -140,8 +140,29 @@ model InstagramAccount {
   automations Automation[]
   dmLogs      DmLog[]
   linkClicks  LinkClick[]
+  followerSnapshots FollowerSnapshot[]
 
   @@index([workspaceId])
+}
+
+/// Daily follower total for one account. Instagram only retains ~30 days of
+/// account insights, so history beyond that window exists only because we
+/// record it here. One row per account per day.
+model FollowerSnapshot {
+  id                 String   @id @default(cuid())
+  instagramAccountId String
+  /// Midnight UTC of the day this count belongs to.
+  date               DateTime @db.Date
+  followersCount     Int
+  /// True when the row was reconstructed from follower_count insight deltas
+  /// rather than observed directly, so it can be corrected later.
+  backfilled         Boolean  @default(false)
+  createdAt          DateTime @default(now())
+
+  instagramAccount InstagramAccount @relation(fields: [instagramAccountId], references: [id], onDelete: Cascade)
+
+  @@unique([instagramAccountId, date])
+  @@index([instagramAccountId, date])
 }
 
 model Automation {
@@ -157,11 +178,23 @@ model Automation {
   matchAnyPost   Boolean @default(false)
   keywords       String[]
   matchAnyWord   Boolean @default(false)
+  // Also fire this campaign when someone sends a DM whose text matches the
+  // keywords above. Independent of the post trigger — a DM has no media, so
+  // postId / matchAnyPost do not apply to it.
+  dmTriggerEnabled Boolean @default(false)
   dmMessage      String
   openingDmEnabled     Boolean @default(false)
   openingDmMessage     String?
   openingDmButtonLabel String?
   linkButtonLabel      String?
+  requireFollow           Boolean @default(false)
+  followPromptMessage     String?
+  followPromptButtonLabel String?
+  followUpEnabled Boolean @default(false)
+  followUpMessage String?
+  // Minutes to wait after the link is delivered before sending the follow-up.
+  // 0 sends it right away.
+  followUpDelayMinutes Int @default(0)
   publicReplyEnabled Boolean @default(false)
   publicReplyMessage String?
   publicReplyMessages String[] @default([])
